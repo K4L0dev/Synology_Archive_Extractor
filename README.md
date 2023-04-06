@@ -1,4 +1,4 @@
-# Synology_ArchiveExtractor
+# Synology_Archive_Extractor
 
 usage:
 <p align="leftr"><img src="images/sae.png"></p>
