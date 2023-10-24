@@ -138,7 +138,7 @@ def extractFileFromArchive(keytype: str,archive: str, destdir: str, paths: list 
 
 print("Synology Archive Extractor v0.9 - K4L0")
 print("---------------------------------------")
-parser = argparse.ArgumentParser(description='example: "sae.py -k SYSTEM  -a DSM_DS918+_42962.pat -d ."')
+parser = argparse.ArgumentParser(description='example: "sudo python sae.py -k SYSTEM  -a DSM_DS918+_42962.pat -d ."')
 parser.add_argument('-k', '--keytype',type=str, required=True, help='SynoArchive keytype.', choices=['SYSTEM', 'NANO', 'JSON', 'SPK', 'UNK4','SSDB','UNK6','UNK7','DEV','WEDJAT','UNK10','SMALL'])
 parser.add_argument('-a', '--archive',type=str, required=True, help='SynoArchive file path.')
 parser.add_argument('-d', '--destdir',type=str, required=True, help='The directory to which to extract files.')
