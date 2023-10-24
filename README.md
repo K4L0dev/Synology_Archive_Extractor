@@ -5,7 +5,7 @@ usage:
 
 Supports all synoarchive types.
 
-Run it on your own nas.
+Run it on your own nas, with root privilege.
 
 On x86 linux, the required libraries are located in /usr/lib:
 
