@@ -39,18 +39,18 @@ class SynoArchiveFlags(IntFlag):
 
 
 class SynoArchiveKeytype(IntFlag):
-    SYSTEM= 0, # System
-    NANO= 1, # Nano
-    JSON= 2, # SecurityJson
-    SPK= 3, # Spk
-    UNK4= 4, # ?
+    SYSTEM= 0, # DSM
+    NANO= 1, # NANO
+    JSON= 2, # NANO_META
+    SPK= 3, # PKG
+    UNK4= 4, # SYNOMIBCOLLECTOR
     SSDB= 5, # SECURITYSCAN_DB
-    UNK6= 6, # ?
-    UNK7= 7, # ?
-    DEV= 8, # /var/packages/syno_dev_token
-    WEDJAT= 9, # Wedjat
-    UNK10= 10, # ?
-    SMALL= 11 # Small Patch
+    UNK6= 6, # AUTOUPDATE
+    UNK7= 7, # FIRMWARE
+    DEV= 8, # PKG_DEV_TOKEN (/var/packages/syno_dev_token)
+    WEDJAT= 9, # SYNOPROTECTION (Wedjat)
+    UNK10= 10, # DSM_SUPPORT_PATCH
+    SMALL= 11 # JUNIOR_EXPANSION_PACK_PATCH (Small Patch)
 
 
 class SynoArchiveCtx(ctypes.Structure):
@@ -136,7 +136,7 @@ def extractFileFromArchive(keytype: str,archive: str, destdir: str, paths: list 
 
     return True
 
-print("Synology Archive Extractor v0.9 - K4L0")
+print("Synology Archive Extractor v0.91 - K4L0")
 print("---------------------------------------")
 parser = argparse.ArgumentParser(description='example: "sudo python sae.py -k SYSTEM  -a DSM_DS918+_42962.pat -d ."')
 parser.add_argument('-k', '--keytype',type=str, required=True, help='SynoArchive keytype.', choices=['SYSTEM', 'NANO', 'JSON', 'SPK', 'UNK4','SSDB','UNK6','UNK7','DEV','WEDJAT','UNK10','SMALL'])
