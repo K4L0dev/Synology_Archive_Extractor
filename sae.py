@@ -3,6 +3,7 @@
 import ctypes
 from enum import IntFlag
 import argparse
+import os
 
 _libcodesign = ctypes.CDLL("libsynocodesign.so")
 
@@ -43,13 +44,13 @@ class SynoArchiveKeytype(IntFlag):
     NANO= 1, # NANO
     JSON= 2, # NANO_META
     SPK= 3, # PKG
-    UNK4= 4, # SYNOMIBCOLLECTOR
+    SYNOMIBCOLLECTOR= 4, # SYNOMIBCOLLECTOR
     SSDB= 5, # SECURITYSCAN_DB
-    UNK6= 6, # AUTOUPDATE
-    UNK7= 7, # FIRMWARE
+    AUTOUPDATE= 6, # AUTOUPDATE
+    FIRMWARE= 7, # FIRMWARE
     DEV= 8, # PKG_DEV_TOKEN (/var/packages/syno_dev_token)
     WEDJAT= 9, # SYNOPROTECTION (Wedjat)
-    UNK10= 10, # DSM_SUPPORT_PATCH
+    DSM_SUPPORT_PATCH= 10, # DSM_SUPPORT_PATCH
     SMALL= 11 # JUNIOR_EXPANSION_PACK_PATCH (Small Patch)
 
 
@@ -136,13 +137,17 @@ def extractFileFromArchive(keytype: str,archive: str, destdir: str, paths: list 
 
     return True
 
-print("Synology Archive Extractor v0.91 - K4L0")
+print("Synology Archive Extractor v0.92 - K4L0")
 print("---------------------------------------")
-parser = argparse.ArgumentParser(description='example: "sudo python sae.py -k SYSTEM  -a DSM_DS918+_42962.pat -d ."')
-parser.add_argument('-k', '--keytype',type=str, required=True, help='SynoArchive keytype.', choices=['SYSTEM', 'NANO', 'JSON', 'SPK', 'UNK4','SSDB','UNK6','UNK7','DEV','WEDJAT','UNK10','SMALL'])
-parser.add_argument('-a', '--archive',type=str, required=True, help='SynoArchive file path.')
-parser.add_argument('-d', '--destdir',type=str, required=True, help='The directory to which to extract files.')
-args = parser.parse_args()
+if os.geteuid() != 0:
+   print("You are not root permission!") 
+   exit
+else:
+   parser = argparse.ArgumentParser(description='example: "sudo python sae.py -k SYSTEM  -a DSM_DS918+_42962.pat -d ."')
+   parser.add_argument('-k', '--keytype',type=str, required=True, help='SynoArchive keytype.', choices=['SYSTEM', 'NANO', 'JSON', 'SPK', 'UNK4','SSDB','UNK6','UNK7','DEV','WEDJAT','UNK10','SMALL'])
+   parser.add_argument('-a', '--archive',type=str, required=True, help='SynoArchive file path.')
+   parser.add_argument('-d', '--destdir',type=str, required=True, help='The directory to which to extract files.')
+   args = parser.parse_args()
 
-f=extractFileFromArchive(args.keytype, args.archive, args.destdir)
-print(f)
+   f=extractFileFromArchive(args.keytype, args.archive, args.destdir)
+   print(f)
