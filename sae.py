@@ -152,17 +152,17 @@ def extractFileFromArchive(keytype: str,archive: str, destdir: str, paths: list 
 
     ret = archiver.open(_keytype, archive)
     if 0 != ret:
-        print('Failed to open SynoArchive(errno: {})'.format(ret))
+        print('Failed to open SynoArchive(errno: {})'.format(ret), SynoArchiveErrortype(ret))
         return False
 
     ret = archiver.extract(flags, paths)
     if 0 != ret:
-        print('Failed to extract file (errno: {})'.format(ret))
+        print('Failed to extract file (errno: {})'.format(ret), SynoArchiveErrortype(ret))
         return False
 
     return True
 
-print("Synology Archive Extractor v0.92 - K4L0")
+print("Synology Archive Extractor v1.0 - K4L0")
 print("---------------------------------------")
 if os.geteuid() != 0:
    print("You are not root permission!") 
@@ -172,7 +172,8 @@ else:
    parser.add_argument('-k', '--keytype',type=str, required=True, help='SynoArchive keytype.', choices=['SYSTEM', 'NANO', 'JSON', 'SPK', 'SYNOMIBCOLLECTOR','SSDB','AUTOUPDATE','FIRMWARE','DEV','WEDJAT','DSM_SUPPORT_PATCH','SMALL'])
    parser.add_argument('-a', '--archive',type=str, required=True, help='SynoArchive file path.')
    parser.add_argument('-d', '--destdir',type=str, required=True, help='The directory to which to extract files.')
+   parser.add_argument('-f', '--files',nargs='+', required=False, help='Specifies the filename of the archive to be extracted.')    
    args = parser.parse_args()
 
-   f=extractFileFromArchive(args.keytype, args.archive, args.destdir)
-   print(f)
+   f=extractFileFromArchive(args.keytype, args.archive, args.destdir, args.files)
+   print('Success: ', f)
