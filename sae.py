@@ -102,7 +102,7 @@ class SynoArchive(object):
         else:
             return 0
 
-    def extract(self, flags, files=[]):
+    def extract(self, flags, files=None):
         if not files:
             result = _synoarchive_extract_multiple(
                 ctypes.c_void_p(self.ctx),
@@ -133,47 +133,63 @@ class SynoArchive(object):
         _synoarchive_free(self.ctx)
 
 
-def extractFileFromArchive(keytype: str,archive: str, destdir: str, paths: list = []) -> bool:
+def extract_file_from_archive(keytype: str,archive: str, destdir: str, paths: list = None) -> bool:
     """
     Args:
         keytype (str)
-        archive (str): SynoArchive file path.
-        destdir (str): The directory to which to extract files.
-        paths (list): The paths in DB to extract.
-            It will extract all files if this argument is `None` or the list is empty.
+        archive (str): synoArchive file path.
+        destdir (str): the directory to which to extract files.
+        paths (list): the paths in DB to extract.
+            it will extract all files if this argument is `None` or the list is empty.
 
     Returns:
         bool: True if successful, False otherwise.
     """
 
+
     archiver = SynoArchive(destdir)
     flags = SynoArchiveFlags.OWNER | SynoArchiveFlags.PERM | SynoArchiveFlags.TIME
-    _keytype = SynoArchiveKeytype[keytype]
+    selected_keytype = None
 
-    ret = archiver.open(_keytype, archive)
+    if keytype is None:
+        for ktype in SynoArchiveKeytype:
+            test_archiver = SynoArchive(destdir)
+            ret = test_archiver.open(ktype, archive)
+            if ret == 0:
+                selected_keytype = ktype
+                print("Autodetect keytype: ", ktype.name)
+                break
+        if selected_keytype is None:
+            print("Failed to open SynoArchive with all keytypes.")
+            return False
+    else:
+        selected_keytype = SynoArchiveKeytype[keytype]
+
+
+    ret = archiver.open(selected_keytype, archive)
     if 0 != ret:
-        print('Failed to open SynoArchive(errno: {})'.format(ret), SynoArchiveErrortype(ret))
+        print("Failed to open SynoArchive(errno: {})".format(ret), SynoArchiveErrortype(ret))
         return False
 
     ret = archiver.extract(flags, paths)
     if 0 != ret:
-        print('Failed to extract file (errno: {})'.format(ret), SynoArchiveErrortype(ret))
+        print("Failed to extract file (errno: {})".format(ret), SynoArchiveErrortype(ret))
         return False
 
     return True
 
-print("Synology Archive Extractor v1.0 - K4L0")
-print("---------------------------------------")
+print("Synology Archive Extractor v1.1 - K4L0")
+print("--------------------------------------")
 if os.geteuid() != 0:
    print("You are not root permission!") 
-   exit
+   exit()
 else:
    parser = argparse.ArgumentParser(description='example: "sudo python sae.py -k SYSTEM  -a DSM_DS918+_42962.pat -d ."')
-   parser.add_argument('-k', '--keytype',type=str, required=True, help='SynoArchive keytype.', choices=['SYSTEM', 'NANO', 'JSON', 'SPK', 'SYNOMIBCOLLECTOR','SSDB','AUTOUPDATE','FIRMWARE','DEV','WEDJAT','DSM_SUPPORT_PATCH','SMALL'])
-   parser.add_argument('-a', '--archive',type=str, required=True, help='SynoArchive file path.')
-   parser.add_argument('-d', '--destdir',type=str, required=True, help='The directory to which to extract files.')
-   parser.add_argument('-f', '--files',nargs='+', required=False, help='Specifies the filename of the archive to be extracted.')    
+   parser.add_argument('-k', '--keytype', type=str, required=False, help='SynoArchive keytype. If not specified, all keytypes will be tried automatically until one succeeds.', choices=['SYSTEM', 'NANO', 'JSON', 'SPK', 'SYNOMIBCOLLECTOR','SSDB','AUTOUPDATE','FIRMWARE','DEV','WEDJAT','DSM_SUPPORT_PATCH','SMALL'])
+   parser.add_argument('-a', '--archive', type=str, required=True, help='SynoArchive file path.')
+   parser.add_argument('-d', '--destdir', type=str, required=True, help='The directory to which to extract files.')
+   parser.add_argument('-f', '--files', nargs='+', required=False, help='Specifies the filename of the archive to be extracted.')
    args = parser.parse_args()
 
-   f=extractFileFromArchive(args.keytype, args.archive, args.destdir, args.files)
-   print('Success: ', f)
+   f=extract_file_from_archive(args.keytype, args.archive, args.destdir, args.files)
+   print("Success: ", f)
